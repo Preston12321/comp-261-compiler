@@ -29,6 +29,7 @@ void printer(char*);  // Forward declaration of printing function
 
 digit	[0-9]
 alpha	[a-z,A-Z]
+wspace [\t\n" "]
 
 
 /* Below the %% are the "rules" for the lexical analyzer.  They are 
@@ -39,9 +40,15 @@ alpha	[a-z,A-Z]
  */
 %%
 
-{alpha}({alpha}|{digit})*	{ printer("Identifier"); }
-{digit}+	 	{ printer("Integer"); }
+({alpha}|_)({alpha}|{digit}|_)*	{ printer("Identifier"); }
+-?{digit}+              { printer("Integer"); }
 "="                     { printer("Equals"); }
+"+"                     { printer("Plus"); }
+"-"                     { printer("Minus"); }
+"*"                     { printer("Times"); }
+"/"                     { printer("Divide"); }
+"("                     { printer("LParen"); }
+")"                     { printer("RParen"); }
 
 [ \t\n]+		;  /*when see whitespace, do nothing*/
 
