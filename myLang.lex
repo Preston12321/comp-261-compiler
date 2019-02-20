@@ -41,7 +41,10 @@ wspace [\t\n" "]
 %%
 
 ({alpha}|_)({alpha}|{digit}|_)*	{ printer("Identifier"); }
--?{digit}+              { printer("Integer"); }
+-?{digit}+                      { printer("Integer"); }
+-?{digit}+(f|(\.{digit}+f?))    { printer("Float"); } /* Also accepts number ending with 'f' */
+
+ /* Operators */
 "="                     { printer("Equals"); }
 "+"                     { printer("Plus"); }
 "-"                     { printer("Minus"); }
