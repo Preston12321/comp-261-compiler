@@ -44,6 +44,10 @@ wspace [\t\n" "]
 -?{digit}+                      { printer("Integer"); }
 -?{digit}+(f|(\.{digit}+f?))    { printer("Float"); } /* Also accepts number ending with 'f' */
 
+ /* TODO: Fix this...
+  * ((\"({alpha}|{digit}|{wspace})*\")|('({alpha}|{digit}|{wspace})*'))             { printer("String"); }
+  */
+
  /* Operators */
 "="                     { printer("Equals"); }
 "+"                     { printer("Plus"); }
@@ -52,6 +56,8 @@ wspace [\t\n" "]
 "/"                     { printer("Divide"); }
 "("                     { printer("LParen"); }
 ")"                     { printer("RParen"); }
+"{"                     { printer("LBrace"); }
+"}"                     { printer("RBrace"); }
 
  /* Control Flow Keywords */
 "if"                   { printer("If Statement"); }
@@ -61,7 +67,6 @@ wspace [\t\n" "]
 "while"                { printer("While Clause/Loop"); }
 
 [ \t\n]+		;  /*when see whitespace, do nothing*/
-
 
 
 %%
