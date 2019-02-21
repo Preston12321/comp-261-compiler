@@ -53,6 +53,13 @@ wspace [\t\n" "]
 "("                     { printer("LParen"); }
 ")"                     { printer("RParen"); }
 
+ /* Control Flow Keywords */
+"if"                   { printer("If Statement"); }
+"else"                 { printer("Else Statement"); }
+"for"                  { printer("For Loop"); }
+"do"                   { printer("Do Loop"); }
+"while"                { printer("While Clause/Loop"); }
+
 [ \t\n]+		;  /*when see whitespace, do nothing*/
 
 
