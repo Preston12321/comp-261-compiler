@@ -10,10 +10,10 @@
 #include<stdio.h>
 #include<stdlib.h>
 
-/* 
-// Included to allow information about tokens from Bison file to propagate to here 
+
+/* Included to allow information about tokens from Bison file to propagate to here */
 #include "example1.tab.h" // Leave commented out until Milestone Two
-*/
+
  
 void printer(char*);  // Forward declaration of printing function
 
@@ -41,7 +41,7 @@ wspace [\t\n" "]
 %%
 
 ({alpha}|_)({alpha}|{digit}|_)*	{ printer("Identifier"); }
--?{digit}+                      { printer("Integer"); }
+-?{digit}+                      { printer("Integer"); return INT; }
 -?{digit}+(f|(\.{digit}+f?))    { printer("Float"); } /* Also accepts number ending with 'f' */
 
  /* TODO: Fix this...
