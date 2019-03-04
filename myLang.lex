@@ -12,7 +12,7 @@
 
 
 /* Included to allow information about tokens from Bison file to propagate to here */
-#include "example1.tab.h" // Leave commented out until Milestone Two
+#include "myLang.tab.h" // Leave commented out until Milestone Two
 
  
 void printer(char*);  // Forward declaration of printing function
@@ -29,7 +29,6 @@ void printer(char*);  // Forward declaration of printing function
 
 digit	[0-9]
 alpha	[a-z,A-Z]
-wspace [\t\n" "]
 
 
 /* Below the %% are the "rules" for the lexical analyzer.  They are 
@@ -40,31 +39,59 @@ wspace [\t\n" "]
  */
 %%
 
-({alpha}|_)({alpha}|{digit}|_)*	{ printer("Identifier"); }
--?{digit}+                      { printer("Integer"); return INT; }
--?{digit}+(f|(\.{digit}+f?))    { printer("Float"); } /* Also accepts number ending with 'f' */
-
- /* TODO: Fix this...
-  * ((\"({alpha}|{digit}|{wspace})*\")|('({alpha}|{digit}|{wspace})*'))             { printer("String"); }
-  */
-
- /* Operators */
-"="                     { printer("Equals"); }
-"+"                     { printer("Plus"); }
-"-"                     { printer("Minus"); }
-"*"                     { printer("Times"); }
-"/"                     { printer("Divide"); }
-"("                     { printer("LParen"); }
-")"                     { printer("RParen"); }
-"{"                     { printer("LBrace"); }
-"}"                     { printer("RBrace"); }
+ /* Comments */
+"//".*                          { printer("Line Comment"); return LCOMMENT; }
+"/*"([^*]|("*"[^/]))*"*/"       { printer("Multi-Line Comment"); return MCOMMENT; }
 
  /* Control Flow Keywords */
-"if"                   { printer("If Statement"); }
-"else"                 { printer("Else Statement"); }
-"for"                  { printer("For Loop"); }
-"do"                   { printer("Do Loop"); }
-"while"                { printer("While Clause/Loop"); }
+"if"                   { printer("If Keyword"); return IF; }
+"else"                 { printer("Else Keyword"); return ELSE; }
+"for"                  { printer("For Keyword"); return FOR; }
+"do"                   { printer("Do Keyword"); return DO; }
+"while"                { printer("While Keyword"); return WHILE; }
+"return"               { printer("Return Keyword"); return RET; }
+
+ /* Data Type Keywords */
+"int"                  { printer("Int Keyword"); return INT_KWD; }
+"float"                { printer("Float Keyword"); return FLOAT_KWD; }
+"string"               { printer("String Keyword"); return STRING_KWD; }
+"bool"                 { printer("Bool Keyword"); return BOOL_KWD; }
+
+ /* Identifiers */
+({alpha}|_)({alpha}|{digit}|_)*	{ printer("Identifier"); return IDENT; }
+
+ /* Data Type Literals (Except Strings) */
+-?{digit}+                      { printer("Integer"); return INT_LIT; }
+-?{digit}+(f|(\.{digit}+f?))    { printer("Float"); return FLOAT_LIT; } /* Also accepts number ending with 'f' */
+\"[^"]*\"                       { printer("String"); return STRING_LIT; }
+("true"|"false")                { printer("Bool"); return BOOL_LIT; }
+
+ /* Operators */
+"="                     { printer("Equals"); return EQUALS; }
+"+"                     { printer("Plus"); return PLUS; }
+"-"                     { printer("Minus"); return MINUS; }
+"*"                     { printer("Times"); return TIMES; }
+"/"                     { printer("Divide"); return DIVIDE; }
+"("                     { printer("LParen"); return LPAREN; }
+")"                     { printer("RParen"); return RPAREN; }
+
+ /* Comparison Operators */
+"<"                     { printer("Less Than"); return LESS; }
+">"                     { printer("Greater Than"); return GREATER; }
+"<="                    { printer("Less or Equal"); return LEQ; }
+">="                    { printer("Greater or Equal"); return GEQ; }
+"=="                    { printer("Equivalent"); return EQUIV; }
+"!="                    { printer("Not Equivalent"); return NEQUIV; }
+
+ /* Boolean Logic */
+"||"                    { printer("Or"); return OR; }
+"&&"                    { printer("And"); return AND; }
+"!"                     { printer("Not"); return NOT; }
+
+ /* Program Structure */
+"{"                     { printer("LBrace"); return LBRACE; }
+"}"                     { printer("RBrace"); return RBRACE; }
+";"                     { printer("End"); return END; }
 
 [ \t\n]+		;  /*when see whitespace, do nothing*/
 

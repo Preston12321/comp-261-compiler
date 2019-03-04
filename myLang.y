@@ -28,9 +28,50 @@ void parseprint(char*);  // forward declaration of printing function
  * (a - b) - c over a - (b - c).
  */
 
-%token INT 
-%token IDENT 
+%token LCOMMENT
+%token MCOMMENT
+
+%token IF
+%token ELSE
+%token FOR
+%token DO
+%token WHILE
+%token RET
+
+%token INT_KWD
+%token FLOAT_KWD
+%token STRING_KWD
+%token BOOL_KWD
+
+%token IDENT
+
+%token INT_LIT
+%token FLOAT_LIT
+%token STRING_LIT
+%token BOOL_LIT
+
 %token EQUALS
+%left PLUS
+%left MINUS
+%left TIMES
+%left DIVIDE
+%token LPAREN
+%token RPAREN
+
+%left LESS
+%left GREATER
+%left LEQ
+%left GEQ
+%left EQUIV
+%left NEQUIV
+
+%left OR
+%left AND
+%token NOT
+
+%token LBRACE
+%token RBRACE
+%token END
 
 
 %%
@@ -41,10 +82,83 @@ void parseprint(char*);  // forward declaration of printing function
  * additional rules follow, one per line, with a semi-colon marking the end of a set of rules for a given LHS
  */
 
-assignments:     assign                 // First rule allows a sequence of assignment statements of any length
-|                assign assignments
+flow-block:      do-block                         { parseprint("do block"); }
+|                for-block                        { parseprint("for block"); }
+|                while-block                      { parseprint("while block"); }
+|                if-block                         { parseprint("if block"); }
+|                if-else-block                    { parseprint("if (else) block"); }
 ;
-assign:     IDENT EQUALS INT          { parseprint("assign -> id = int"); }
+do-block:        DO block WHILE condition END
+|                DO statement WHILE condition END
+;
+for-block:       FOR condition block
+|                FOR condition statement
+;
+while-block:     WHILE condition block
+|                WHILE condition statement
+;
+if-else-block:   if-block else-block
+;
+if-block:        IF condition block
+|                IF condition statement
+;
+else-block:      ELSE block
+|                ELSE statement
+;
+condition:       LPAREN expression RPAREN   { parseprint("condition"); }
+;
+block:           LBRACE RBRACE              { parseprint("empty block"); }
+|                LBRACE statements RBRACE   { parseprint("block"); }
+;
+statements:      statement
+|                statement statements
+;
+statement:       assign END                 { parseprint("assign statement"); }
+|                declaration END            { parseprint("declaration statement"); }
+|                return END                 { parseprint("return statement"); }
+|                END                        { parseprint("empty statement"); }
+;
+return:          RET
+|                RET expression
+;
+assign:
+|                IDENT EQUALS expression    { parseprint("assign -> id = exp"); }
+;
+declaration:     data-type IDENT            { parseprint("declare -> id"); }
+|                data-type assign           { parseprint("declare -> id = exp"); }
+;
+expression:      expression operator expression
+|                expression compare expression
+|                expression logic expression
+|                NOT expression
+|                LPAREN expression RPAREN
+|                IDENT
+|                literal
+;
+operator:        PLUS
+|                MINUS
+|                TIMES
+|                DIVIDE
+;
+compare:         LESS
+|                GREATER
+|                LEQ
+|                GEQ
+|                EQUIV
+|                NEQUIV
+;
+logic:           OR
+|                AND
+;
+literal:         INT_LIT
+|                FLOAT_LIT
+|                STRING_LIT
+|                BOOL_LIT
+;
+data-type:       INT_KWD                   { parseprint("int type"); }
+|                FLOAT_KWD                 { parseprint("float type"); }
+|                STRING_KWD                { parseprint("string type"); }
+|                BOOL_KWD                  { parseprint("bool type"); }
 ;
 
 
@@ -64,7 +178,7 @@ void parseprint(char* str)
 
 
 int main() {
-  fprintf(stderr, "Enter statements/expressions to parse:\n"
+  fprintf(stderr, "Enter statements/expressions to parse:\n");
   int res = yyparse();
   if (res == 0)
     fprintf(stderr, "Successful parsing.\n");
