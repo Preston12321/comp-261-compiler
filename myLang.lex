@@ -28,7 +28,7 @@ void printer(char*);  // Forward declaration of printing function
  */
 
 digit	[0-9]
-alpha	[a-z,A-Z]
+alpha	[a-zA-Z]
 
 
 /* Below the %% are the "rules" for the lexical analyzer.  They are 
@@ -56,15 +56,16 @@ alpha	[a-z,A-Z]
 "float"                { printer("Float Keyword"); return FLOAT_KWD; }
 "string"               { printer("String Keyword"); return STRING_KWD; }
 "bool"                 { printer("Bool Keyword"); return BOOL_KWD; }
-
- /* Identifiers */
-({alpha}|_)({alpha}|{digit}|_)*	{ printer("Identifier"); return IDENT; }
+"void"                 { printer("Void Keyword"); return VOID_KWD; }
 
  /* Data Type Literals (Except Strings) */
 -?{digit}+                      { printer("Integer"); return INT_LIT; }
 -?{digit}+(f|(\.{digit}+f?))    { printer("Float"); return FLOAT_LIT; } /* Also accepts number ending with 'f' */
 \"[^"]*\"                       { printer("String"); return STRING_LIT; }
-("true"|"false")                { printer("Bool"); return BOOL_LIT; }
+("true")|("false")                { printer("Bool"); return BOOL_LIT; }
+
+ /* Identifiers */
+({alpha}|_)({alpha}|{digit}|_)*	{ printer("Identifier"); return IDENT; }
 
  /* Operators */
 "="                     { printer("Equals"); return EQUALS; }
@@ -89,6 +90,7 @@ alpha	[a-z,A-Z]
 "!"                     { printer("Not"); return NOT; }
 
  /* Program Structure */
+","                     { printer("Comma"); return COMMA; }
 "{"                     { printer("LBrace"); return LBRACE; }
 "}"                     { printer("RBrace"); return RBRACE; }
 ";"                     { printer("End"); return END; }

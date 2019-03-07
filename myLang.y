@@ -42,6 +42,7 @@ void parseprint(char*);  // forward declaration of printing function
 %token FLOAT_KWD
 %token STRING_KWD
 %token BOOL_KWD
+%token VOID_KWD
 
 %token IDENT
 
@@ -72,6 +73,7 @@ void parseprint(char*);  // forward declaration of printing function
 %token LBRACE
 %token RBRACE
 %token END
+%token COMMA
 
 
 %%
@@ -82,11 +84,35 @@ void parseprint(char*);  // forward declaration of printing function
  * additional rules follow, one per line, with a semi-colon marking the end of a set of rules for a given LHS
  */
 
+program:         good-code                        { parseprint("full program"); }
+;
+good-code:       code
+|                function
+|                good-code good-code
+;
+function-call:   IDENT argument-list
+;
+argument-list:   LPAREN RPAREN                    { parseprint("empty arg list"); }
+|                LPAREN arguments RPAREN          { parseprint("arg list"); }
+;
+arguments:       expression
+|                expression COMMA arguments
+;
+function:        data-type IDENT parameter-list block   { parseprint("function definition"); }
+;
+parameter-list:  LPAREN RPAREN                    { parseprint("empty param list"); }
+|                LPAREN parameters RPAREN         { parseprint("param list"); }
+;
+parameters:      parameter
+|                parameter COMMA parameters
+;
+parameter:       data-type IDENT
+;
 flow-block:      do-block                         { parseprint("do block"); }
 |                for-block                        { parseprint("for block"); }
 |                while-block                      { parseprint("while block"); }
 |                if-block                         { parseprint("if block"); }
-|                if-else-block                    { parseprint("if (else) block"); }
+|                if-block else-block                   { parseprint("if (else) block"); }
 ;
 do-block:        DO block WHILE condition END
 |                DO statement WHILE condition END
@@ -97,8 +123,6 @@ for-block:       FOR condition block
 while-block:     WHILE condition block
 |                WHILE condition statement
 ;
-if-else-block:   if-block else-block
-;
 if-block:        IF condition block
 |                IF condition statement
 ;
@@ -108,21 +132,26 @@ else-block:      ELSE block
 condition:       LPAREN expression RPAREN   { parseprint("condition"); }
 ;
 block:           LBRACE RBRACE              { parseprint("empty block"); }
-|                LBRACE statements RBRACE   { parseprint("block"); }
+|                LBRACE code RBRACE         { parseprint("block"); }
+;
+code:            statements
+|                block
+|                flow-block
+|                code code
 ;
 statements:      statement
 |                statement statements
 ;
 statement:       assign END                 { parseprint("assign statement"); }
 |                declaration END            { parseprint("declaration statement"); }
+|                function-call END          { parseprint("function call statement"); }
 |                return END                 { parseprint("return statement"); }
 |                END                        { parseprint("empty statement"); }
 ;
 return:          RET
 |                RET expression
 ;
-assign:
-|                IDENT EQUALS expression    { parseprint("assign -> id = exp"); }
+assign:          IDENT EQUALS expression    { parseprint("assign -> id = exp"); }
 ;
 declaration:     data-type IDENT            { parseprint("declare -> id"); }
 |                data-type assign           { parseprint("declare -> id = exp"); }
@@ -131,7 +160,7 @@ expression:      expression operator expression
 |                expression compare expression
 |                expression logic expression
 |                NOT expression
-|                LPAREN expression RPAREN
+|                condition
 |                IDENT
 |                literal
 ;
