@@ -40,8 +40,8 @@ alpha	[a-zA-Z]
 %%
 
  /* Comments */
-"//".*                          { printer("Line Comment"); return LCOMMENT; }
-"/*"([^*]|("*"[^/]))*"*/"       { printer("Multi-Line Comment"); return MCOMMENT; }
+"//".*                          { printer("Line Comment"); }
+"/*"([^*]|("*"[^/]))*"*/"       { printer("Multi-Line Comment"); }
 
  /* Control Flow Keywords */
 "if"                   { printer("If Keyword"); return IF; }
@@ -93,7 +93,7 @@ alpha	[a-zA-Z]
 ","                     { printer("Comma"); return COMMA; }
 "{"                     { printer("LBrace"); return LBRACE; }
 "}"                     { printer("RBrace"); return RBRACE; }
-";"                     { printer("End"); return END; }
+";"                     { printer("Semicolon"); return SCOL; }
 
 [ \t\n]+		;  /*when see whitespace, do nothing*/
 

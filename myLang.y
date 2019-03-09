@@ -28,9 +28,6 @@ void parseprint(char*);  // forward declaration of printing function
  * (a - b) - c over a - (b - c).
  */
 
-%token LCOMMENT
-%token MCOMMENT
-
 %token IF
 %token ELSE
 %token FOR
@@ -72,7 +69,7 @@ void parseprint(char*);  // forward declaration of printing function
 
 %token LBRACE
 %token RBRACE
-%token END
+%token SCOL
 %token COMMA
 
 
@@ -114,11 +111,20 @@ flow-block:      do-block                         { parseprint("do block"); }
 |                if-block                         { parseprint("if block"); }
 |                if-block else-block                   { parseprint("if (else) block"); }
 ;
-do-block:        DO block WHILE condition END
-|                DO statement WHILE condition END
+do-block:        DO block WHILE condition SCOL
+|                DO statement WHILE condition SCOL
 ;
-for-block:       FOR condition block
-|                FOR condition statement
+for-block:       FOR LPAREN for-condition RPAREN block
+|                FOR LPAREN for-condition RPAREN statement
+;
+for-condition:   SCOL SCOL
+|                SCOL expression SCOL
+|                SCOL expression SCOL action
+|                initial SCOL expression SCOL
+|                initial SCOL expression SCOL action
+;
+initial:         assign
+|                declaration
 ;
 while-block:     WHILE condition block
 |                WHILE condition statement
@@ -142,11 +148,13 @@ code:            statements
 statements:      statement
 |                statement statements
 ;
-statement:       assign END                 { parseprint("assign statement"); }
-|                declaration END            { parseprint("declaration statement"); }
-|                function-call END          { parseprint("function call statement"); }
-|                return END                 { parseprint("return statement"); }
-|                END                        { parseprint("empty statement"); }
+statement:       action SCOL
+|                SCOL                        { parseprint("empty statement"); }
+;
+action:          assign                      { parseprint("assign statement"); }
+|                declaration                 { parseprint("declaration statement"); }
+|                function-call               { parseprint("function call statement"); }
+|                return                      { parseprint("return statement"); }
 ;
 return:          RET
 |                RET expression
