@@ -9,4 +9,5 @@ bison:
 	bison -d myLang.y
 	flex -o myLang.lex.c myLang.lex
 	bison -d myLang.y
+	mkdir -p build
 	gcc -o build/myLang myLang.lex.c myLang.tab.c -ll -lm
